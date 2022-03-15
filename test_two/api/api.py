@@ -91,3 +91,10 @@ def update_selections(id: int):
     selection_json = selection.to_json()
     dispatch_event(SelectionUpdated, selection_json)
     return selection_json
+
+@selections_blueprint.route("/<id>", methods=['DELETE'])
+def delete_selections(id: int):
+    selection_entity = SelectionEntity()
+    selection = selection_entity.get_by_id(id)
+    selection.delete()
+    return { 'message': 'selection record deleted with success!' }

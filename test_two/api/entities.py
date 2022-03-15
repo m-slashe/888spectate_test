@@ -5,6 +5,7 @@ from api.database import get_database, verify_table_exists
 from api.model import Boolean, DateTime, EnumType, Float, ForeignKey, Integer, Property, Varchar
 from typing import Any, Dict, List, cast
 from datetime import datetime
+from dateutil import parser
 
 class EventType(Enum):
     PrePlay = 'preplay'
@@ -87,7 +88,7 @@ class Entity:
 
     def is_date(self, string: str):
         try:
-            datetime.strptime(string, '%a, %d %b %Y %H:%M:%S GMT')
+            parser.parse(string)
             return True
         except:
             return False
@@ -99,7 +100,7 @@ class Entity:
             value = member_property.value
 
             if self.is_date(member_property.value):
-                value = datetime.strptime(member_property.value, '%a, %d %b %Y %H:%M:%S GMT')
+                value = parser.parse(member_property.value)
 
             values.append(value)
         return values
@@ -168,7 +169,7 @@ class Entity:
 
         mydb = get_database()
         mycursor = mydb.cursor()
-        val = (str(id))
+        val = (str(id),)
         mycursor.execute(f'{select_statment} WHERE id = %s', val)
         results = self.__tranform_result__(mycursor)
         results_transformed = [self.__class__().update_by_json(result) for result in results]
@@ -226,6 +227,18 @@ class Entity:
 
         mydb.commit()
         logger.info(f"{mycursor.rowcount} record updated.")
+
+    def delete(self):
+        mydb = get_database()
+        mycursor = mydb.cursor()
+
+        sql = f'DELETE FROM {self.table_name} WHERE id = %s'
+        val = (cast(Property, getattr(self, 'id')).value,)
+
+        mycursor.execute(sql, val)
+
+        mydb.commit()
+        logger.info(f"{mycursor.rowcount} record deleted.")
 
     def to_json(self):
         properties = self.get_properties(with_id=True)
