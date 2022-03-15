@@ -1,0 +1,6 @@
+version: "2.1"
+services:
+  app:
+    command: ["python3", "-m", "pytest"]
+    environment:
+      ENVIRONMENT: test

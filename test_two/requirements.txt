@@ -1,0 +1,4 @@
+Flask===2.0.3
+mysql-connector-python===8.0.28
+pytest===7.0.1
+pytest-mysql===2.3.1

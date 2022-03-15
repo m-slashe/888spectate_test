@@ -1,0 +1,23 @@
+version: "2.1"
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_APP: app:create_app()
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: 888spectate
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 1s
+      retries: 10
